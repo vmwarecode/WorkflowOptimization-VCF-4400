@@ -41,7 +41,7 @@ class NetworkAutomator:
             else:
                 system_dvs_to_pgs, pg_names_to_transport_types, vds_to_usedbynsxt_flag = \
                     self.input_multisystem_dvs_info(dvs_selection, pg_types_to_vmnics, input_mgmt_pg_name,
-                                                    input_vsan_pg_name, input_vmotion_pg_name, cluster_name)
+                                                    input_vsan_pg_name, input_vmotion_pg_name, cluster_name, vsan_storage)
                 dvs_payload = self.prepare_dvs_payload_for_advanced_profile_multisystem(system_dvs_to_pgs,
                                                                                         pg_names_to_transport_types,
                                                                                         vds_to_usedbynsxt_flag,
@@ -53,7 +53,7 @@ class NetworkAutomator:
             else:
                 system_dvs_to_pgs, pg_names_to_transport_types, vds_to_usedbynsxt_flag = \
                     self.input_multisystem_dvs_info(dvs_selection, pg_types_to_vmnics, input_mgmt_pg_name,
-                                                    input_vsan_pg_name, input_vmotion_pg_name, cluster_name)
+                                                    input_vsan_pg_name, input_vmotion_pg_name, cluster_name, vsan_storage)
             nics_used_for_system_vds = None
             if nic_profile == 'TWO_HIGH_SPEED':
                 nics_used_for_system_vds = ['vmnic0', 'vmnic1']
@@ -218,7 +218,7 @@ class NetworkAutomator:
         return pg_name
 
     def input_multisystem_dvs_info(self, dvs_selection, pg_types_to_vmnics, input_mgmt_pg_name=None,
-                                   input_vsan_pg_name=None, input_vmotion_pg_name=None, cluster_name=None):
+                                   input_vsan_pg_name=None, input_vmotion_pg_name=None, cluster_name=None, vsan_storage=None):
         while True:
             system_dvs_to_pgs = {}
             pg_names_to_transport_types = {}
@@ -239,7 +239,7 @@ class NetworkAutomator:
                         portgroups.append(mgmt_pg_name)
                         pg_names_to_transport_types[mgmt_pg_name] = pg_type
                     else:
-                        if pg_type == 'VSAN':
+                        if pg_type == 'VSAN' and vsan_storage:
                             vsan_pg_name = self.input_pg_name_and_check_prefix("VSAN", "Virtual SAN") \
                                 if input_vsan_pg_name is None else input_vsan_pg_name
                             portgroups.append(vsan_pg_name)

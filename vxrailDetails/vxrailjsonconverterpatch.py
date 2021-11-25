@@ -165,6 +165,9 @@ class VxRailJsonConverterPatch:
                                 portgroup_types.append(pg['transportType'])
                         for (key, value) in pg_types_to_vmnics.items():
                             key_list = json.loads(key)
+                            # Remove VSAN PG if it is passed from VxRail JSON Input in case of COMPUTE cluster
+                            if not vsan_storage and "VSAN" in key_list:
+                                key_list.remove("VSAN")
                             if set(key_list) == set(portgroup_types):
                                 vmnics_list = vmnics_list + self.create_vmnics_spec_for_system_dvs_advanced_profile(
                                     value, vds['name'], pgtypes_to_vmnicuplink_mapping[key])

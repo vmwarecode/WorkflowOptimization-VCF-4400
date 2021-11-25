@@ -148,13 +148,14 @@ class VxRailJsonConverter:
                 jsonobj = jsonobj[attr]
         return jsonobj
 
+    # vlan could be 0 <= vlan <= 4096. Returning -1 if does not provided in vxrail json spec
     def __get_vlan(self, net_type):
         vdssets = self.__get_attr_value(self.vxrail_config, ["network", "vds"])
         for vdsset in vdssets:
             for pg in vdsset["portgroups"]:
                 if pg["type"] == net_type:
                     return pg["vlan_id"]
-        return 0
+        return -1
 
     def get_vmnics_mapped_to_system_dvs(self):
         vdssets = self.__get_attr_value(self.vxrail_config, ["network", "vds"])
@@ -381,7 +382,7 @@ class VxRailJsonConverter:
             for nw in h["network"]:
                 if nw["type"] == "VSAN":
                     vsan_network_present = True
-        if cluster_type == 'STANDARD' and vsan_vlan != 0 and vsan_network_present is True:
+        if cluster_type == 'STANDARD' and vsan_vlan != -1 and vsan_network_present is True:
             vsan_network = {
                 "type": "VSAN",
                 "vlanId": self.__get_vlan("VSAN"),
