@@ -216,10 +216,14 @@ class VxRailJsonConverter:
                 for portgroup in vdsset["portgroups"]:
                     if portgroup["type"] in pg_types:
                         active_uplinks = []
-                        for uplink in portgroup["failover_order"]["active"]:
-                            active_uplinks.append(uplink)
+                        for activeUplink in portgroup["failover_order"]["active"]:
+                            active_uplinks.append(activeUplink)
+                        # Adding standby uplink as active, in backend we will make it standby
+                        for standbyUplink in portgroup["failover_order"]["standby"]:
+                            active_uplinks.append(standbyUplink)
                         if len(active_uplinks) != 2:
-                            print("\033[91m Please provide active/active failover order for portgroups in VxRail Json Input\033[00m")
+                            print("\033[91m Please provide exact 2 uplinks for active/active or active/standby failover"
+                                  " order for portgroups in VxRail Json Input\033[00m")
                             exit(1)
                         pg_type_to_active_uplinks[portgroup['type']] = active_uplinks
         return pg_type_to_active_uplinks

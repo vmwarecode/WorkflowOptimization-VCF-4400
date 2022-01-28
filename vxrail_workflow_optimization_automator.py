@@ -17,6 +17,8 @@ from vxrailDetails.vxrailjsonconverterpatch import VxRailJsonConverterPatch
 
 __author__ = 'virtis'
 
+REQ_VCF_VER = ['4.4']
+
 
 class VxRailWorkflowOptimizationAutomator:
     def __init__(self):
@@ -36,6 +38,7 @@ class VxRailWorkflowOptimizationAutomator:
     def run(self):
         try:
             print(*self.two_line_separator, sep='\n')
+            self.check_sddc_manager_version()
             self.utils.printCyan("Please choose one of the below option:")
             self.utils.printBold("1) Create Domain")
             self.utils.printBold("2) Add Cluster")
@@ -57,6 +60,19 @@ class VxRailWorkflowOptimizationAutomator:
             print()
         except KeyboardInterrupt:
             print()
+
+    def check_sddc_manager_version(self):
+        url = 'https://' + self.hostname + '/v1/sddc-managers'
+        sddc_json = self.utils.get_request(url)
+        sddc_ver = None
+        for domain in sddc_json['elements']:
+            sddc_ver = domain['version'].split("-")[0]
+        for req_ver in REQ_VCF_VER:
+            if sddc_ver is not None and sddc_ver.startswith(req_ver):
+                return
+        print('\033[91m Fetched VCF version is {} which is not matching with required version {}'.format(sddc_ver,REQ_VCF_VER))
+        print('\033[91m Please make sure the VCF version should be {}'.format(REQ_VCF_VER))
+        exit(1)
 
     def check_lock_acquired_by_workflows(self):
         url = 'http://' + self.hostname + '/locks'

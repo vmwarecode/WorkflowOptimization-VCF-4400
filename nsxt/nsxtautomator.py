@@ -2,6 +2,8 @@
 # Description: Prepare NSX-T Spec
 
 import ipaddress
+import re
+
 from utils.utils import Utils
 import sys
 
@@ -139,7 +141,16 @@ class NsxtAutomator:
 
     def create_static_ip_pool(self):
         self.utils.printCyan("Create New Static IP Pool")
-        pool_name = input("\033[1m Enter Pool Name: \033[0m")
+        while True:
+            pool_name = input("\033[1m Enter Pool Name: \033[0m")
+            reg = "^[a-zA-Z0-9-_]+$"
+            match_re = re.compile(reg)
+            result = re.search(match_re, pool_name)
+            if not result:
+                self.utils.printRed("Invalid IP pool address name. The IP address pool name should contain only "
+                                    "alphanumeric characters along with '-' or '_' without spaces")
+            else:
+                break
         description = input("\033[1m Enter Description(Optional): \033[0m")
         ip_address_pool_spec = {
             "name": pool_name,
